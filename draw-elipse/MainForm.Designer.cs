@@ -37,11 +37,13 @@
             // 
             // workSpace
             // 
+            this.workSpace.BackColor = System.Drawing.SystemColors.Window;
             this.workSpace.Location = new System.Drawing.Point(12, 171);
             this.workSpace.Name = "workSpace";
             this.workSpace.Size = new System.Drawing.Size(500, 500);
             this.workSpace.TabIndex = 0;
             this.workSpace.TabStop = false;
+            this.workSpace.MouseClick += new System.Windows.Forms.MouseEventHandler(this.workSpace_MouseClick);
             // 
             // buttonClear
             // 
@@ -52,6 +54,7 @@
             this.buttonClear.TabIndex = 1;
             this.buttonClear.Text = "Clear";
             this.buttonClear.UseVisualStyleBackColor = true;
+            this.buttonClear.Click += new System.EventHandler(this.buttonClear_Click);
             // 
             // labelDDA
             // 
