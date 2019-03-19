@@ -80,5 +80,34 @@ namespace draw_elipse
                 radio.X = radio.Y = -1;
             }
         }
+
+        private void DDA(Point centro, Point radio)
+        {
+            double yk = 0;
+            int xk = 0;
+            int xc = centro.X;
+            int yc = centro.Y;
+            int xf = radio.X;
+            int yf = radio.Y;
+            int rx = xf - xc;
+            int ry = yf - yc;
+
+            r = Math.Sqrt(Math.Pow(a, 2) + Math.Pow(b, 2));
+            r = Math.Round(r);
+            r = Math.Abs(r);
+
+            yk = Math.Sqrt(Math.Pow(r, 2) - Math.Pow(xk, 2));
+            yk = Math.Round(yk);
+
+            for (xk = 0; xk <= yk; xk++)
+            {
+                yk = Math.Sqrt(Math.Pow(r, 2) - Math.Pow(xk, 2));
+                yk = Math.Round(yk);
+
+                setPixelCircle(xc, yc, xk, (int)yk, Color.Red);
+            }
+
+            pictureBox1.Image = bmp;
+        }
     }
 }
