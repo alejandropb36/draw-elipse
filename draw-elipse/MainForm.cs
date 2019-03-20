@@ -68,7 +68,7 @@ namespace draw_elipse
 
                 /*Ejecucuión de DDA*/
                 sw.Restart();
-                //DDA(centro, radio);
+                DDA(centro, radio);
                 labelDDA.Text = "DDA: " + String.Format("{0}", sw.Elapsed.TotalMilliseconds) + " s";
 
                 /*Ejecución de Bresenham*/
@@ -86,7 +86,7 @@ namespace draw_elipse
         {
             if (x + xc > 0 && x + xc < width && y + yc > 0 && y + yc < height)  /// Cuadrante 2
                 bmp.SetPixel(x + xc, y + yc, color);
-            if (-x + xc > 0 && -x + xc < width && -y + yc > 0 && -y + yc < height)  ///CUADRANTE 6
+            if (-x + xc > 0 && -x + xc < width && -y + yc > 0 && -y + yc < height)  ///Cuadrante 6
                 bmp.SetPixel(-x + xc, -y + yc, color);
             if (-x + xc > 0 && -x + xc < width && y + yc > 0 && y + yc < height)  ///Cuadrante 3
                 bmp.SetPixel(-x + xc, y + yc, color);
@@ -100,15 +100,15 @@ namespace draw_elipse
             int yc = centro.Y;
             int xf = radio.X;
             int yf = radio.Y;
-            int rx = xf - xc;
-            int ry = yf - yc;
+            int rx, ry;
             double rx2, ry2;
             double rx2ry2;
             double x, y;
 
+            rx = Math.Abs(xf - xc);
+            ry = Math.Abs(yc - yf);
             x = y = 0;
-            rx = Math.Abs(rx);
-            ry = Math.Abs(ry);
+
             rx2 = Math.Pow(rx, 2);
             ry2 = Math.Pow(ry, 2);
             rx2ry2 = rx2 * ry2;
@@ -135,47 +135,59 @@ namespace draw_elipse
             int yc = centro.Y;
             int xf = radio.X;
             int yf = radio.Y;
-            int rx = xf - xc;
-            int ry = yf - yc;
+            int rx, ry;
             double rx2, ry2;
             double x, y;
             double pk, pk2;
+            double dx, dy;
+            rx = Math.Abs(xf - xc);
+            ry = Math.Abs(yc - yf);
 
             x = 0;
             y = ry;
-            rx = Math.Abs(rx);
-            ry = Math.Abs(ry);
+            
             rx2 = Math.Pow(rx, 2);
             ry2 = Math.Pow(ry, 2);
-            pk = ry2 - (rx2 * ry) + (0.25 * rx2);   ///Inicializacion PK para primera iteracion por cada x iterar en y
+            pk = ry2 - (rx2 * ry) + (0.25 * rx2);
 
-            while ((ry2 * x) < (rx2 * y))   ///Cuando radio cuadrado de y sea mayor al radio cuadrado de x iterando con el opuesto para esta iteracion
+            dx = 2 * ry2 * x;
+            dy = 2 * rx2 * y;
+
+            while (dx < dy)
             {
                 if (pk < 0)
                 {
                     x++;
-                    pk = pk + (2 * ry2 * x) + ry2;
+                    dx = dx + (2 * ry2);
+                    pk = pk + dx + ry2;
                 }
                 else
                 {
-                    x++; y--;
-                    pk = pk + (2 * ry2 * x) - (2 * rx2 * y) + ry2;
+                    x++;
+                    y--;
+                    dx = dx + (2 * ry2);
+                    dy = dy - (2 * rx2);
+                    pk = pk + dx - dy + ry2;
                 }
-                setPixelCuadrante(xc, yc, (int)x, (int)y, Color.Blue);        
+                setPixelCuadrante(xc, yc, (int)x, (int)y, Color.Blue);
             }
 
             pk2 = (ry2) * Math.Pow((x + 0.5), 2) + (rx2) * Math.Pow((y - 1), 2) - (rx2 * ry2);
-            while (y > 0)
+            while (y >= 0)
             {
                 if (pk2 > 0)
                 {
                     y--;
-                    pk2 = pk2 - (2 * rx2 * y) + rx2;
+                    dy = dy - (2 * rx2);
+                    pk2 = pk2 + rx2 - dy;
                 }
                 else
                 {
-                    x++; y--;
-                    pk2 = pk2 + (2 * ry2 * x) - (2 * rx2 * y) + rx2;
+                    y--;
+                    x++;
+                    dx = dx + (2 * ry2);
+                    dy = dy - (2 * rx2);
+                    pk2 = pk2 + dx - dy + rx2;
                 }
                 setPixelCuadrante(xc, yc, (int)x, (int)y, Color.Blue);
             }
