@@ -66,6 +66,9 @@ namespace draw_elipse
                 Console.WriteLine("punto inicial: (" + centro.X + ", " + centro.Y + ")");
                 Console.WriteLine("punto final: (" + radio.X + ", " + radio.Y + ")");
 
+                bmp.SetPixel(centro.X, centro.Y, Color.Pink);
+                bmp.SetPixel(radio.X, radio.Y, Color.Pink);
+
                 /*Ejecucuión de DDA*/
                 sw.Restart();
                 DDA(centro, radio);
@@ -78,6 +81,8 @@ namespace draw_elipse
 
                 centro.X = centro.Y = -1;
                 radio.X = radio.Y = -1;
+
+                workSpace.Image = bmp;
             }
         }
 
