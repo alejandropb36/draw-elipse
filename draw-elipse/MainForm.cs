@@ -69,11 +69,11 @@ namespace draw_elipse
                 /*Ejecucuión de DDA*/
                 sw.Restart();
                 //DDA(centro, radio);
-                workSpace.Text = "DDA: " + String.Format("{0}", sw.Elapsed.TotalMilliseconds) + " s";
+                labelDDA.Text = "DDA: " + String.Format("{0}", sw.Elapsed.TotalMilliseconds) + " s";
 
                 /*Ejecución de Bresenham*/
                 sw.Restart();
-                //bresenham(centro, radio);
+                bresenham(centro, radio);
                 labelBresenham.Text = "Bresenham: " + String.Format("{0}", sw.Elapsed.TotalMilliseconds) + " s";
 
                 centro.X = centro.Y = -1;
@@ -81,33 +81,106 @@ namespace draw_elipse
             }
         }
 
+        /*Dibujo de cadrantes de una elipse*/
+        void setPixelCuadrante(int xc, int yc, int x, int y, Color color)
+        {
+            if (x + xc > 0 && x + xc < width && y + yc > 0 && y + yc < height)  /// Cuadrante 2
+                bmp.SetPixel(x + xc, y + yc, color);
+            if (-x + xc > 0 && -x + xc < width && -y + yc > 0 && -y + yc < height)  ///CUADRANTE 6
+                bmp.SetPixel(-x + xc, -y + yc, color);
+            if (-x + xc > 0 && -x + xc < width && y + yc > 0 && y + yc < height)  ///Cuadrante 3
+                bmp.SetPixel(-x + xc, y + yc, color);
+            if (x + xc > 0 && x + xc < width && -y + yc > 0 && -y + yc < height)  ///Cuadrante 7
+                bmp.SetPixel(x + xc, -y + yc, color);
+        }
+
         private void DDA(Point centro, Point radio)
         {
-            double yk = 0;
-            int xk = 0;
             int xc = centro.X;
             int yc = centro.Y;
             int xf = radio.X;
             int yf = radio.Y;
             int rx = xf - xc;
             int ry = yf - yc;
+            double rx2, ry2;
+            double rx2ry2;
+            double x, y;
 
-            r = Math.Sqrt(Math.Pow(a, 2) + Math.Pow(b, 2));
-            r = Math.Round(r);
-            r = Math.Abs(r);
+            x = y = 0;
+            rx = Math.Abs(rx);
+            ry = Math.Abs(ry);
+            rx2 = Math.Pow(rx, 2);
+            ry2 = Math.Pow(ry, 2);
+            rx2ry2 = rx2 * ry2;
 
-            yk = Math.Sqrt(Math.Pow(r, 2) - Math.Pow(xk, 2));
-            yk = Math.Round(yk);
-
-            for (xk = 0; xk <= yk; xk++)
+            for(x = 0; x < rx; x++)
             {
-                yk = Math.Sqrt(Math.Pow(r, 2) - Math.Pow(xk, 2));
-                yk = Math.Round(yk);
-
-                setPixelCircle(xc, yc, xk, (int)yk, Color.Red);
+                y = Math.Sqrt((rx2ry2 - (Math.Pow(x, 2) * ry2)) / (rx2));
+                y = Math.Round(y);
+                setPixelCuadrante(xc, yc, (int)x, (int)y, Color.Red);
+            }
+            for (y = 0; y < ry; y++)
+            {
+                x = Math.Sqrt((rx2ry2 - (Math.Pow(y, 2) * rx2)) / (ry2));
+                x = Math.Round(x);
+                setPixelCuadrante(xc, yc, (int)x, (int)y, Color.Red);
             }
 
-            pictureBox1.Image = bmp;
+            workSpace.Image = bmp;
+        }
+
+        private void bresenham(Point centro, Point radio)
+        {
+            int xc = centro.X;
+            int yc = centro.Y;
+            int xf = radio.X;
+            int yf = radio.Y;
+            int rx = xf - xc;
+            int ry = yf - yc;
+            double rx2, ry2;
+            double x, y;
+            double pk, pk2;
+
+            x = 0;
+            y = ry;
+            rx = Math.Abs(rx);
+            ry = Math.Abs(ry);
+            rx2 = Math.Pow(rx, 2);
+            ry2 = Math.Pow(ry, 2);
+            pk = ry2 - (rx2 * ry) + (0.25 * rx2);   ///Inicializacion PK para primera iteracion por cada x iterar en y
+
+            while ((ry2 * x) < (rx2 * y))   ///Cuando radio cuadrado de y sea mayor al radio cuadrado de x iterando con el opuesto para esta iteracion
+            {
+                if (pk < 0)
+                {
+                    x++;
+                    pk = pk + (2 * ry2 * x) + ry2;
+                }
+                else
+                {
+                    x++; y--;
+                    pk = pk + (2 * ry2 * x) - (2 * rx2 * y) + ry2;
+                }
+                setPixelCuadrante(xc, yc, (int)x, (int)y, Color.Blue);        
+            }
+
+            pk2 = (ry2) * Math.Pow((x + 0.5), 2) + (rx2) * Math.Pow((y - 1), 2) - (rx2 * ry2);
+            while (y > 0)
+            {
+                if (pk2 > 0)
+                {
+                    y--;
+                    pk2 = pk2 - (2 * rx2 * y) + rx2;
+                }
+                else
+                {
+                    x++; y--;
+                    pk2 = pk2 + (2 * ry2 * x) - (2 * rx2 * y) + rx2;
+                }
+                setPixelCuadrante(xc, yc, (int)x, (int)y, Color.Blue);
+            }
+
+            workSpace.Image = bmp;
         }
     }
 }
